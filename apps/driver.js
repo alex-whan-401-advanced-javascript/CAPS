@@ -2,22 +2,39 @@
 
 const emitter = require('../lib/events');
 
-emitter.on('pickup', pickupHandler);
-emitter.on('in-transit', deliveredHandler);
+// emitter.on('pickup', pickupHandler);
+// emitter.on('in-transit', deliveredHandler);
 
-const pickupHandler = order => {
+// Monitor the system for events …
+// pickup->in-transit handler
+emitter.on('pickup', payload => {
   setTimeout(() => {
-    console.log(`DRIVER: picked up ${order.orderID}`);
-    emitter.emit('in-transit', order);
+    console.log(`DRIVER: picked up ${payload.orderId}`);
+    emitter.emit('in-transit', payload);
   }, 1000);
-};
+});
 
-const deliveredHandler = order => {
+// in-transit->delivered handler
+emitter.on('in-transit', payload => {
   setTimeout(() => {
-    console.log(`DRIVER: delivered ${order.orderID}`);
-    emitter.emit('delivered', order);
-  });
-};
+    console.log('Delivered!');
+    emitter.emit('delivered', payload);
+  }, 3000);
+});
+
+// const pickupHandler = order => {
+//   setTimeout(() => {
+//     console.log(`DRIVER: picked up ${order.orderID}`);
+//     emitter.emit('in-transit', order);
+//   }, 1000);
+// };
+
+// const deliveredHandler = order => {
+//   setTimeout(() => {
+//     console.log(`DRIVER: delivered ${order.orderID}`);
+//     emitter.emit('delivered', order);
+//   });
+// };
 
 // When pickup happens, something happens. 1 second later, something else happens (in-transit is emitted/broadcast). Then, after 3 seconds or whatever, something else happens
 
@@ -26,7 +43,7 @@ const deliveredHandler = order => {
 // The SIGNATURE of that function is a single argument with a value of the payload
 
 // driver.js - Drivers Module
-// Monitor the system for events …
+
 // On the ‘pickup’ event …
 // Wait 1 second
 // Log “DRIVER: picked up [ORDER_ID]” to the console.

@@ -1,6 +1,6 @@
 'use strict';
 
-const events = require('./lib/events');
+const emitter = require('./lib/events');
 require('./apps/driver');
 require('./apps/vendor');
 
@@ -14,15 +14,15 @@ require('./modules/vendor');
 
 // EVENTS
 // Whatever you put in this second position will be the PAYLOAD. You can put anything in that you can store as a variable
-events.on('pickup', payload => {
+emitter.on('pickup', payload => {
   logEvent('pickup', payload);
 });
 
-events.on('in-transit', payload => {
+emitter.on('in-transit', payload => {
   logEvent('in-transit', payload);
 });
 
-events.on('delivered', payload => {
+emitter.on('delivered', payload => {
   logEvent('delivered', payload);
 });
 
