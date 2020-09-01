@@ -25,8 +25,8 @@ module.exports = {
     setInterval(() => {
       let order = {
         store: faker.company.companyName,
-        orderId: faker.random.number,
-        customerName: faker.fake('{{ name.lastName }}, {{ name.firstName }}'), // uses Mustache templating
+        orderID: faker.random.number,
+        customerName: faker.fake('{{ name.lastName }} {{ name.firstName }}'), // uses Mustache templating
         address: faker.address.streetAddress,
       };
       emitter.emit('pickup', order);
@@ -38,5 +38,5 @@ module.exports = {
 // Whenever the ‘delivered’ event occurs
 // Log “thank you” to the console
 emitter.on('delivered', payload => {
-  console.log('Thank you!');
+  console.log(`VENDOR: Thank you for delivering ${payload.orderID}`);
 });

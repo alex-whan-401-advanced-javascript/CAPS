@@ -9,7 +9,7 @@ const emitter = require('../lib/events');
 // pickup->in-transit handler
 emitter.on('pickup', payload => {
   setTimeout(() => {
-    console.log(`DRIVER: picked up ${payload.orderId}`);
+    console.log(`DRIVER: picked up ${payload.orderID}`);
     emitter.emit('in-transit', payload);
   }, 1000);
 });

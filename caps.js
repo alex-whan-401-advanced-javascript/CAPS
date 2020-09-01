@@ -9,9 +9,6 @@ require('./apps/vendor');
 // Logs every event to the console with a timestamp and the event payload
 // i.e. “EVENT {}”
 
-require('./modules/driver');
-require('./modules/vendor');
-
 // EVENTS
 // Whatever you put in this second position will be the PAYLOAD. You can put anything in that you can store as a variable
 emitter.on('pickup', payload => {
