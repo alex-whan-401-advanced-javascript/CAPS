@@ -1,5 +1,10 @@
 'use strict';
 
+const emitter = require('../lib/events');
+require('dotenv');
+const store = process.env.STORE;
+const faker = require('faker');
+
 // Set interval - every 5 seconds, simulate a new customer order
 // Can use whatever object we want for now, but try user faker to make it easier moving forward
 

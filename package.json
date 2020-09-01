@@ -4,7 +4,7 @@
   "description": "## The Code Academy Parcel Service (CAPS)",
   "main": "caps.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/alex-whan-401-advanced-javascript/CAPS/issues"
   },
-  "homepage": "https://github.com/alex-whan-401-advanced-javascript/CAPS#readme"
+  "homepage": "https://github.com/alex-whan-401-advanced-javascript/CAPS#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "faker": "^5.1.0",
+    "jest": "^26.4.2"
+  }
 }

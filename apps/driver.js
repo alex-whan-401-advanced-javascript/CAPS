@@ -1,12 +1,11 @@
 'use strict';
 
-const emitter = require('./events');
-const { emit } = require('process');
+const emitter = require('../lib/events');
 
-emitter.on('pickup', inTransitHandler);
+emitter.on('pickup', pickupHandler);
 emitter.on('in-transit', deliveredHandler);
 
-const inTransitHandler = order => {
+const pickupHandler = order => {
   setTimeout(() => {
     console.log(`DRIVER: picked up ${order.orderID}`);
     emitter.emit('in-transit', order);

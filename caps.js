@@ -1,7 +1,8 @@
 'use strict';
 
-const events = require('./events');
-const { EventEmitter } = require('events');
+const events = require('./lib/events');
+require('./apps/driver');
+require('./apps/vendor');
 
 // Main Hub Application
 // Manages the state of every package (ready for pickup, in transit, delivered, etc)
@@ -13,15 +14,15 @@ require('./modules/vendor');
 
 // EVENTS
 // Whatever you put in this second position will be the PAYLOAD. You can put anything in that you can store as a variable
-events.emit('pickup', payload => {
+events.on('pickup', payload => {
   logEvent('pickup', payload);
 });
 
-events.emit('in-transit', payload => {
+events.on('in-transit', payload => {
   logEvent('in-transit', payload);
 });
 
-events.emit('delivered', payload => {
+events.on('delivered', payload => {
   logEvent('delivered', payload);
 });
 
