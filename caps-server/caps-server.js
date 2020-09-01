@@ -4,9 +4,9 @@
 // Log events
 // What does it "care" about? The pickup, in-transit, and delivered events
 
-const emitter = require('./lib/events');
-require('./apps/driver');
-require('./apps/vendor').start();
+const emitter = require('../lib/events');
+require('../driver/driver');
+require('../vendor/vendor').start();
 
 emitter.on('pickup', eventHandler);
 emitter.on('in-transit', eventHandler);

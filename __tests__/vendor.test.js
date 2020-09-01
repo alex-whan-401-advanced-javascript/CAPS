@@ -1,6 +1,6 @@
 'use strict';
 
-const vendor = require('../apps/vendor');
+const vendor = require('../vendor/vendor');
 const emitter = require('../lib/events');
 
 jest.useFakeTimers();
