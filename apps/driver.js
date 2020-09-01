@@ -2,25 +2,35 @@
 
 const emitter = require('../lib/events');
 
-// emitter.on('pickup', pickupHandler);
+emitter.on('pickup', pickupHandler);
 // emitter.on('in-transit', deliveredHandler);
+
+// driver.js - Drivers Module
+
+// On the ‘pickup’ event …
+// Wait 1 second
+// Log “DRIVER: picked up [ORDER_ID]” to the console.
+// Emit an ‘in-transit’ event with the payload you received
+// Wait 3 seconds
+// Log “delivered” to the console
+// Emit a ‘delivered’ event with the same payload
 
 // Monitor the system for events …
 // pickup->in-transit handler
-emitter.on('pickup', payload => {
+function pickupHandler(payload) {
   setTimeout(() => {
     console.log(`DRIVER: picked up ${payload.orderID}`);
     emitter.emit('in-transit', payload);
   }, 1000);
-});
-
-// in-transit->delivered handler
-emitter.on('in-transit', payload => {
   setTimeout(() => {
-    console.log('Delivered!');
+    console.log(`DRIVER: delivered ${payload.orderID}`);
     emitter.emit('delivered', payload);
   }, 3000);
-});
+}
+// emitter.on('pickup', payload => {});
+
+// // in-transit->delivered handler
+// emitter.on('in-transit', payload => {});
 
 // const pickupHandler = order => {
 //   setTimeout(() => {
@@ -41,13 +51,3 @@ emitter.on('in-transit', payload => {
 // handleSave
 // Whenever handleSave runs, I'm going to run a certain function, and that function has a particular signature
 // The SIGNATURE of that function is a single argument with a value of the payload
-
-// driver.js - Drivers Module
-
-// On the ‘pickup’ event …
-// Wait 1 second
-// Log “DRIVER: picked up [ORDER_ID]” to the console.
-// Emit an ‘in-transit’ event with the payload you received
-// Wait 3 seconds
-// Log “delivered” to the console
-// Emit a ‘delivered’ event with the same payload
