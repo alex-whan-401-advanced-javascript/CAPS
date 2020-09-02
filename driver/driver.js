@@ -1,53 +1,78 @@
+/* eslint-disable comma-dangle */
 'use strict';
 
-const emitter = require('../lib/events');
+/* This application is intended to be run by delivery drivers in their vehicles. If the application is running, say on their phone, anytime a package is ready for pickup, they would get a notification. When they pickup the package, they might hit a button to let the system know that the package is in transit. And once they deliver the package to the customer, they could again hit a button that would let everyone (especially the store owner) know that the package was delivered. */
 
-emitter.on('pickup', pickupHandler);
-// emitter.on('in-transit', deliveredHandler);
+require('dotenv').config();
+const net = require('net');
 
-// driver.js - Drivers Module
+const client = new net.Socket();
 
-// On the ‘pickup’ event …
+const host = process.env.HOST || 'localhost';
+const port = process.env.PORT || 3000;
+
+// Connect to the CAPS server
+client.connect(port, host, () => {
+  console.log(
+    `DRIVER app online. Successfully connected to ${host} at ${port}.`
+  );
+});
+
+// Listen for the data event coming in from the CAPS server
+// When data arrives, parse it (it should be JSON) and look for the event property and begin processing…
+
+// If the event is called pickup:
+// Simulate picking up the package
 // Wait 1 second
-// Log “DRIVER: picked up [ORDER_ID]” to the console.
-// Emit an ‘in-transit’ event with the payload you received
+client.on('data', function (data) {
+  let parsedData = JSON.parse(data);
+  if (parsedData.event === 'pickup') {
+    setTimeout(() => {
+      // Log “picking up id” to the console
+      console.log(`Picking up ${parsedData.payload.orderID}`);
+
+      // Create a message object with the following keys:
+      // event - ‘in-transit’
+      // payload - the payload from the data object you just received
+      const messageObj = {
+        event: 'in-transit',
+        payload: parsedData.payload,
+      };
+
+      // Write that message (as a string) to the CAPS server
+      sendMessage(messageObj);
+    }, 1000);
+
+    setTimeout(() => {
+      console.log(`Delivered ${parsedData.payload.orderID}`);
+      const messageObj = {
+        event: 'delivered',
+        payload: parsedData.payload,
+      };
+      sendMessage(messageObj);
+    }, 3000);
+  }
+});
+
+// Simulate delivering the package
 // Wait 3 seconds
-// Log “delivered” to the console
-// Emit a ‘delivered’ event with the same payload
+// Create a message object with the following keys:
+// event - ‘delivered’
+// payload - the payload from the data object you just received
+// Write that message (as a string) to the CAPS server
 
-// Monitor the system for events …
-// pickup->in-transit handler
-function pickupHandler(payload) {
-  setTimeout(() => {
-    console.log(`DRIVER: picked up ${payload.orderID}`);
-    emitter.emit('in-transit', payload);
-  }, 1000);
-  setTimeout(() => {
-    console.log(`DRIVER: delivered ${payload.orderID}`);
-    emitter.emit('delivered', payload);
-  }, 3000);
+// function deliveryHandler(payload) {
+//   setTimeout(() => {
+//     console.log(`Delivered ${payload.orderID}`);
+//     const messageObj = {
+//       event: 'delivered',
+//       payload,
+//     };
+//     sendMessage(messageObj);
+//   }, 3000);
+// }
+
+function sendMessage(messageObj) {
+  const message = JSON.stringify(messageObj);
+  client.write(message);
 }
-// emitter.on('pickup', payload => {});
-
-// // in-transit->delivered handler
-// emitter.on('in-transit', payload => {});
-
-// const pickupHandler = order => {
-//   setTimeout(() => {
-//     console.log(`DRIVER: picked up ${order.orderID}`);
-//     emitter.emit('in-transit', order);
-//   }, 1000);
-// };
-
-// const deliveredHandler = order => {
-//   setTimeout(() => {
-//     console.log(`DRIVER: delivered ${order.orderID}`);
-//     emitter.emit('delivered', order);
-//   });
-// };
-
-// When pickup happens, something happens. 1 second later, something else happens (in-transit is emitted/broadcast). Then, after 3 seconds or whatever, something else happens
-
-// handleSave
-// Whenever handleSave runs, I'm going to run a certain function, and that function has a particular signature
-// The SIGNATURE of that function is a single argument with a value of the payload

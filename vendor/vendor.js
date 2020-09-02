@@ -1,42 +1,69 @@
+/* eslint-disable comma-dangle */
 'use strict';
 
-const emitter = require('../lib/events');
+/* This application is intended to be run by store owners. As soon as they have a package ready for pickup/delivery, they will be sending an event to the hub server with the data describing the delivery. Additionally, the application needs to be listening to the server for other events. Store owners definitely want to know when their packages are picked up, and when they actually get delivered. */
+
+require('dotenv').config();
+const net = require('net');
 const faker = require('faker');
-require('dotenv');
+
+// Use .env to set your store name
 const store = process.env.STORE;
 
-// Set interval - every 5 seconds, simulate a new customer order
-// Can use whatever object we want for now, but try user faker to make it easier moving forward
+const client = new net.Socket();
 
-// First argument in emitter = the 'pickup' event string
-// "attaching fake order as payload" = second argument in the emitter
+const host = process.env.HOST || 'localhost';
+const port = process.env.PORT || 3000;
 
-// Declare your store name (perhaps in a .env file, so that this module is re-usable)
+// Connect to the CAPS server
+client.connect(port, host, () => {
+  console.log(
+    `VENDOR app online. Successfully connected to ${host} at ${port}.`
+  );
 
-// Every 5 seconds, simulate a new customer order
+  setInterval(() => {
+    let order = {
+      store,
+      orderID: faker.random.number(),
+      customerName: faker.fake('{{name.lastName}} {{name.firstName}}'),
+      address: faker.address.streetAddress(),
+    };
 
-// Create a fake order, as an object:
-// storeName, orderId, customerName, address
-// Emit a ‘pickup’ event and attach the fake order as payload
-// HINT: Have some fun by using the faker library to make up phony information
-emitter.on('delivered', payload => {
-  console.log(`VENDOR: Thank you for delivering ${payload.orderID}`);
+    // console.log(order.storeName);
+
+    // Create a message object with the following keys:
+    // event - ‘pickup’
+    // payload - the order object you created in the above step
+    const messageObj = {
+      event: 'pickup',
+      payload: order,
+    };
+
+    sendMessage(messageObj);
+  }, 5000);
 });
 
-module.exports = {
-  start: function () {
-    setInterval(() => {
-      let order = {
-        store,
-        orderID: faker.random.number(),
-        customerName: faker.fake('{{name.lastName}} {{name.firstName}}'), // uses Mustache templating
-        address: faker.address.streetAddress(),
-      };
-      emitter.emit('pickup', order);
-    }, 5000);
-  },
-};
+// Write that message (as a string) to the CAPS server
+function sendMessage(messageObj) {
+  const message = JSON.stringify(messageObj);
+  client.write(message);
+}
 
-// Monitor the system for events …
-// Whenever the ‘delivered’ event occurs
-// Log “thank you” to the console
+// needs to LISTEN to server as well
+// Listen for the data event coming in from the CAPS server
+// When data arrives, parse it (it should be JSON) and look for the event property
+// If the event is called 'delivered'
+// Log “thank you for delivering id” to the console
+// Ignore any data that specifies a different event
+client.on('data', function (data) {
+  // take in data from server
+  // console.log('DATA FROM CAPS SERVER??????', data);
+  let parsedData = JSON.parse(data); // parse for event prop
+  if (parsedData.event === 'delivered') {
+    console.log(`Thank you for delivering ${parsedData.payload.orderID}`);
+  }
+});
+
+client.on('close', function () {
+  console.log('The connection has been closed.');
+});
