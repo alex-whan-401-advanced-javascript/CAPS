@@ -1,2 +1,3 @@
 # CAPS
-The Code Academy Parcel Service (CAPS)
+
+## The Code Academy Parcel Service (CAPS)
