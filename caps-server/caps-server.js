@@ -4,12 +4,8 @@
 The Hub Server has one job – accept all inbound events and data, validate them, and and then re-broadcast them to everyone except the sender. It doesn’t perform any logic other than to ensure that the inbound events are properly formatted before it broadcasts them.
 */
 
-const emitter = require('../lib/events');
-require('../driver/driver');
-require('../vendor/vendor').start();
-
+require('dotenv').config();
 const net = require('net'); // Built-in NODE library
-
 const port = process.env.PORT || 3000;
 const server = net.createServer();
 
@@ -29,6 +25,12 @@ server.on('connection', socket => {
   // less clean here in order to make it cleaner in the functions
   socket.on('data', buffer => onMessageReceived(buffer.toString())); // need to actually CALL toString()
   socket.on('close', () => deleteSocket(socket.id));
+  socket.on('error', e => {
+    console.log('SOCKET ERROR', e);
+  });
+  socket.on('end', e => {
+    delete socketPool[id];
+  });
 });
 
 // Read and parse the incoming data/payload
