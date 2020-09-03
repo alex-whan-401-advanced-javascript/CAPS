@@ -30,10 +30,18 @@ caps.on('connection', socket => {
 
   socket.on('in-transit', payload => {
     caps.to(store).emit('in-transit', payload);
+    const event = 'in-transit';
+    const time = new Date();
+    const eventObj = { event, time, payload };
+    console.log('[EVENT]: ', eventObj);
   });
 
   socket.on('delivered', payload => {
     caps.to(store).emit('delivered', payload);
+    const event = 'delivered';
+    const time = new Date();
+    const eventObj = { event, time, payload };
+    console.log('[EVENT]: ', eventObj);
   });
 });
 
