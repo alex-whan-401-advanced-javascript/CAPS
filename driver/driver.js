@@ -3,7 +3,6 @@
 
 require('dotenv').config();
 const io = require('socket.io-client');
-const { Socket } = require('socket.io-client');
 
 const capsChannel = io.connect('http://localhost:3001/caps');
 

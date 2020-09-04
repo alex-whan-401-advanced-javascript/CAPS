@@ -3,6 +3,7 @@
 require('dotenv').config();
 const store = process.env.STORE;
 const io = require('socket.io')(process.env.PORT || 3000);
+// const { v4: uuid } = require('uuid');
 
 // Create and accept connections on a namespace called caps
 const caps = io.of('/caps'); // our NAMESPACE
