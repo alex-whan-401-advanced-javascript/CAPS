@@ -7,15 +7,9 @@ const io = require('socket.io')(process.env.PORT || 3000);
 // Create and accept connections on a namespace called caps
 const caps = io.of('/caps'); // our NAMESPACE
 
-// Need to make a QUEUE here
-// Task 1: QUEUE UP MESSAGES
-const messages = {
-  // waiting for messages to queue
-};
+// Message queue
+const messages = {};
 
-// Within the namespace:
-// Monitor the ‘join’ event.
-// Each vendor will have their own “room” so that they only get their own delivery notifications
 caps.on('connection', socket => {
   console.log('Connected on: ', socket.id);
 
@@ -25,8 +19,6 @@ caps.on('connection', socket => {
   });
 
   socket.on('received', orderID => {
-    // delete messages from queue after they're received
-    // how do we check driver got the message?
     delete messages[orderID];
   });
 
@@ -61,14 +53,3 @@ function eventLogger(event, payload) {
   const eventObj = { event, time, payload };
   console.log('[EVENT]: ', eventObj);
 }
-
-// Broadcast the events and payload back out to the appropriate clients in the caps namespace
-// function eventLogHandler(event) {
-//   return payload => {
-//     const time = new Date();
-//     const messageObj = str;
-//     const eventName = messageObj.event;
-//     const payload = messageObj.payload;
-//     console.log('[EVENT]: ', { event: eventName, time, payload });
-//   };
-// }
