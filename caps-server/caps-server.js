@@ -7,6 +7,12 @@ const io = require('socket.io')(process.env.PORT || 3000);
 // Create and accept connections on a namespace called caps
 const caps = io.of('/caps'); // our NAMESPACE
 
+// Need to make a QUEUE here
+// Task 1: QUEUE UP MESSAGES
+const messages = {
+  // waiting for messages to queue
+};
+
 // Within the namespace:
 // Monitor the ‘join’ event.
 // Each vendor will have their own “room” so that they only get their own delivery notifications
@@ -18,32 +24,43 @@ caps.on('connection', socket => {
     socket.join(room);
   });
 
-  // Monitor the correct general events
-  // pickup, in-transit, delivered
+  socket.on('received', orderID => {
+    // delete messages from queue after they're received
+    // how do we check driver got the message?
+    delete messages[orderID];
+  });
+
+  // This is saying: "When someone broadcasts 'getall', we'll do this." - who should broadcast it? THE DRIVER! (whenever they connect)
+  socket.on('getall', () => {
+    for (let id in messages) {
+      const payload = messages[id];
+      caps.emit('pickup', payload);
+    }
+  });
+
+  // We need to QUEUE UP pickup messages
   socket.on('pickup', payload => {
+    messages[payload.orderID] = payload; // took out "messages.pickup.driver[orderID]"
+    eventLogger('pickup', payload);
     caps.emit('pickup', payload);
-    const event = 'pickup';
-    const time = new Date();
-    const eventObj = { event, time, payload };
-    console.log('[EVENT]: ', eventObj);
   });
 
   socket.on('in-transit', payload => {
+    eventLogger('in-transit', payload);
     caps.to(store).emit('in-transit', payload);
-    const event = 'in-transit';
-    const time = new Date();
-    const eventObj = { event, time, payload };
-    console.log('[EVENT]: ', eventObj);
   });
 
   socket.on('delivered', payload => {
+    eventLogger('delivered', payload);
     caps.to(store).emit('delivered', payload);
-    const event = 'delivered';
-    const time = new Date();
-    const eventObj = { event, time, payload };
-    console.log('[EVENT]: ', eventObj);
   });
 });
+
+function eventLogger(event, payload) {
+  let time = new Date();
+  const eventObj = { event, time, payload };
+  console.log('[EVENT]: ', eventObj);
+}
 
 // Broadcast the events and payload back out to the appropriate clients in the caps namespace
 // function eventLogHandler(event) {
